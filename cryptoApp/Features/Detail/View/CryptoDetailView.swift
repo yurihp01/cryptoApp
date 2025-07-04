@@ -9,31 +9,53 @@ import SwiftUI
 
 struct CryptoDetailView: View {
     @StateObject var viewModel: CryptoDetailViewModel
-    
+
     var body: some View {
-        VStack(spacing: 24) {
-            VStack(spacing: 8) {
-                Text("\(viewModel.crypto.symbol.displayName) - \(viewModel.crypto.symbol)")
-                    .font(.title3)
-                
-                Text(viewModel.crypto.formattedPrice)
-                    .font(.title2)
-                    .foregroundColor(.gray)
+        Group {
+            switch viewModel.state {
+            case .loading:
+                VStack {
+                    Spacer()
+                    ProgressView("Loading...")
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .font(.headline)
+                    Spacer()
+                }
+
+            case .failure(let error):
+                ErrorView(viewModel: viewModel, error: error)
+            case .success(let crypto):
+                VStack(spacing: 32) {
+                    VStack(spacing: 8) {
+                        Text("\(crypto.symbol.displayName) - \(crypto.symbol.rawValue)")
+                            .font(.title)
+                            .bold()
+
+                        Text(crypto.formattedPrice)
+                            .font(.system(size: 32, weight: .semibold))
+                            .foregroundColor(.gray)
+                    }
+
+                    HStack(spacing: 8) {
+                        Image(systemName: crypto.changeIconName)
+                            .foregroundColor(crypto.changeColor)
+                            .font(.title2)
+
+                        Text(crypto.absoluteAndPercentChange)
+                            .foregroundColor(crypto.changeColor)
+                            .font(.title3)
+                            .bold()
+                    }
+
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 40)
             }
-            
-            HStack(spacing: 8) {
-                Image(systemName: viewModel.crypto.changeIconName)
-                    .foregroundColor(viewModel.crypto.changeColor)
-                
-                Text(viewModel.crypto.absoluteAndPercentChange)
-                    .foregroundColor(viewModel.crypto.changeColor)
-                    .font(.headline)
-            }
-            
-            Spacer()
         }
         .padding()
         .navigationTitle("Details")
         .navigationBarTitleDisplayMode(.inline)
+        .animation(.easeInOut, value: viewModel.state)
     }
 }
