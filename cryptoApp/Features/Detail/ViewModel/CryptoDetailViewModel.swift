@@ -6,12 +6,36 @@
 //
 
 import Foundation
+import Combine
 
-class CryptoDetailViewModel: ObservableObject {
-    @Published var viewState: ViewState<Crypto> = .loading
-    private let ticker: Crypto
+final class CryptoDetailViewModel: ObservableObject {
+    private let service: CryptoWebSocketServiceProtocol
     
-    init(ticker: Crypto) {
-        self.ticker = ticker
+    @Published var crypto: Crypto
+    private var cancellables = Set<AnyCancellable>()
+    
+    init(crypto: Crypto, service: CryptoWebSocketServiceProtocol) {
+        self.crypto = crypto
+        self.service = service
+        
+        bindCrypto()
+    }
+}
+
+private extension CryptoDetailViewModel {
+    func bindCrypto() {
+        service.getCryptos()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] result in
+                switch result {
+                case .success(let cryptos):
+                    guard let self,
+                          let crypto = cryptos.first(where: { $0.symbol == self.crypto.symbol }) else { return }
+                    self.crypto = crypto
+                case .failure:
+                    break
+                }
+            }
+            .store(in: &cancellables)
     }
 }
