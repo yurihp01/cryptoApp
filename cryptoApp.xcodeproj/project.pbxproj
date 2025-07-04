@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DA2D51292E178B6100A783C9 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = DA2D51282E178B6100A783C9 /* Starscream */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		DA8166272E16D7E300E80EFE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -25,19 +29,18 @@
 		DA8166AB2E16E41400E80EFE /* Exceptions for "cryptoApp" folder in "cryptoAppTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				App/Dependencies/AppDependencies.swift,
-				App/Route/CryptoRoute.swift,
+				App/AppCoordinatorView.swift,
 				Data/Error/CryptoError.swift,
+				Data/Model/BinanceStreamWrapper.swift,
 				Data/Model/Crypto.swift,
+				Data/Model/Symbols.swift,
 				Data/Model/ViewState.swift,
 				Data/Repository/CryptoWebSocketService.swift,
-				Features/Custom/CoordinatorView.swift,
 				Features/Detail/View/CryptoDetailView.swift,
 				Features/Detail/ViewModel/CryptoDetailViewModel.swift,
-				Features/List/Coordinator/CryptoListCoordinator.swift,
 				Features/List/View/CryptoListView.swift,
+				Features/List/View/CryptoRowView.swift,
 				Features/List/ViewModel/CryptoListViewModel.swift,
-				"Utils/EnvironmentValues+Extensions.swift",
 			);
 			target = DA8166252E16D7E300E80EFE /* cryptoAppTests */;
 		};
@@ -64,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA2D51292E178B6100A783C9 /* Starscream in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,6 +119,7 @@
 			);
 			name = cryptoApp;
 			packageProductDependencies = (
+				DA2D51282E178B6100A783C9 /* Starscream */,
 			);
 			productName = cryptoApp;
 			productReference = DA8166192E16D7E100E80EFE /* cryptoApp.app */;
@@ -171,6 +176,9 @@
 			);
 			mainGroup = DA8166102E16D7E100E80EFE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DA2D51272E178AD100A783C9 /* XCRemoteSwiftPackageReference "Starscream" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DA81661A2E16D7E100E80EFE /* Products */;
 			projectDirPath = "";
@@ -471,6 +479,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DA2D51272E178AD100A783C9 /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.8;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DA2D51282E178B6100A783C9 /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DA2D51272E178AD100A783C9 /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DA8166112E16D7E100E80EFE /* Project object */;
 }
