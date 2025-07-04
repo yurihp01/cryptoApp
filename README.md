@@ -2,7 +2,7 @@
 
 A modern iOS application built with **SwiftUI**, **Combine**, and **MVVM-C** architecture that tracks real-time cryptocurrency data via WebSocket.
 
-https://github.com/yurihp01/cryptoApp/blob/main/app-working.MP4
+https://github.com/user-attachments/assets/85357ebf-1a41-47ae-8922-95f8ae267243
 
 ---
 
