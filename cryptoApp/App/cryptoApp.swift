@@ -10,8 +10,12 @@ import SwiftUI
 @main
 struct cryptoApp: App {
     var body: some Scene {
-        WindowGroup {
-            AppCoordinatorView()
+        let symbols = Symbols.allCases.map(\.rawValue)
+        let service = CryptoWebSocketService(symbols: symbols)
+        let coordinator = AppCoordinator(service: service)
+
+        return WindowGroup {
+            coordinator.makeRootView()
         }
     }
 }
