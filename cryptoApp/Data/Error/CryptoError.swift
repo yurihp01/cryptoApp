@@ -7,32 +7,22 @@
 
 import Foundation
 
-enum CryptoError: Error, LocalizedError, Equatable {
-    static func == (lhs: CryptoError, rhs: CryptoError) -> Bool {
-        lhs.errorDescription == rhs.errorDescription
-    }
-    
-    case invalidURL
+enum CryptoError: Error, LocalizedError {
     case connectionFailed(Error)
-    case disconnected
     case decodingFailed(Error)
+    case disconnected(code: UInt16, reason: String)
     case unknown
-    case custom(message: String)
 
     var errorDescription: String? {
         switch self {
-        case .invalidURL:
-            return "Invalid URL."
-        case .connectionFailed(let error):
-            return "Connection failed: \(error.localizedDescription)"
-        case .disconnected:
-            return "Connection lost."
-        case .decodingFailed(let error):
-            return "Failed to decode data: \(error.localizedDescription)"
+        case .connectionFailed(let err):
+            return "Connection failed: \(err.localizedDescription)"
+        case .decodingFailed(let err):
+            return "Decoding failed: \(err.localizedDescription)"
+        case .disconnected(let code, let reason):
+            return "Disconnected (\(code)): \(reason)"
         case .unknown:
-            return "An unknown error occurred."
-        case .custom(let message):
-            return message
+            return "Unknown error occurred."
         }
     }
 }
