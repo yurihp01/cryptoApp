@@ -8,7 +8,6 @@
 import Combine
 import Foundation
 
-@MainActor
 final class CryptoListViewModel: ObservableObject {
     @Published var state: ViewState<[Crypto]> = .loading
     
