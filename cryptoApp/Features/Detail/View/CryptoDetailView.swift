@@ -23,7 +23,7 @@ struct CryptoDetailView: View {
                 }
 
             case .failure(let error):
-                ErrorView(viewModel: viewModel, error: error)
+                ErrorView(action: viewModel.retry, error: error)
             case .success(let crypto):
                 VStack(spacing: 32) {
                     VStack(spacing: 8) {

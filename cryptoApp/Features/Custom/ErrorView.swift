@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ErrorView: View {
-    let viewModel: CryptoListViewModel
+    let action: () -> Void
     let error: Error
     
     var body: some View {
@@ -28,9 +28,7 @@ struct ErrorView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
-            Button(action: {
-                viewModel.retry()
-            }) {
+            Button(action: action) {
                 Label("Retry", systemImage: "arrow.clockwise")
                     .padding()
                     .frame(maxWidth: .infinity)
@@ -43,4 +41,3 @@ struct ErrorView: View {
         }
     }
 }
-

@@ -34,6 +34,7 @@
 				Data/Model/Symbols.swift,
 				Data/Model/ViewState.swift,
 				Data/Repository/CryptoWebSocketService.swift,
+				Features/Custom/ErrorView.swift,
 				Features/Detail/View/CryptoDetailView.swift,
 				Features/Detail/ViewModel/CryptoDetailViewModel.swift,
 				Features/List/View/CryptoListView.swift,

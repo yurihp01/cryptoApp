@@ -10,7 +10,7 @@ struct CryptoListView: View {
             case .loading:
                 ProgressView("Loading...")
             case .failure(let error):
-                ErrorView(viewModel: viewModel, error: error)
+                ErrorView(action: viewModel.retry, error: error)
             case .success(let cryptos):
                 List(cryptos, id: \.symbol) { crypto in
                     Button {
