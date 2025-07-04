@@ -5,33 +5,34 @@
 //  Created by Yuri on 04/07/25.
 //
 
-@testable import cryptoApp
+import Foundation
 import Combine
 
 final class CryptoWebSocketServiceStub: CryptoWebSocketServiceProtocol {
-    private let subject = PassthroughSubject<Result<[Crypto], CryptoError>, Never>()
-    private let acceptedSymbols: [String]
-    private var currentCryptos: [String: Crypto] = [:]
+    private let cryptosSubject = CurrentValueSubject<[Crypto], Never>([])
+    private let errorSubject = PassthroughSubject<CryptoError, Never>()
     
-    init(symbols: [String]) {
-        self.acceptedSymbols = symbols
-    }
-    
-    func getCryptos() -> AnyPublisher<Result<[Crypto], CryptoError>, Never> {
-        subject.eraseToAnyPublisher()
-    }
-    
-    func emit(crypto: Crypto) {
-        guard acceptedSymbols.contains(crypto.symbol.rawValue) else { return }
-        currentCryptos[crypto.symbol.rawValue] = crypto
-        subject.send(.success(Array(currentCryptos.values)))
-    }
-    
-    func emitError(_ error: CryptoError) {
-        subject.send(.failure(error))
-    }
-}
+    private(set) var didConnect = false
 
-enum MockError: Error {
-    case disconnected
+    var cryptosPublisher: AnyPublisher<[Crypto], Never> {
+        cryptosSubject.eraseToAnyPublisher()
+    }
+
+    var errorPublisher: AnyPublisher<CryptoError, Never> {
+        errorSubject.eraseToAnyPublisher()
+    }
+
+    init(symbols: [String]) {}
+
+    func connect() {
+        didConnect = true
+    }
+
+    func emit(crypto: Crypto) {
+        cryptosSubject.send([crypto])
+    }
+
+    func emitError(_ error: CryptoError) {
+        errorSubject.send(error)
+    }
 }
