@@ -7,11 +7,7 @@
 
 import Foundation
 
-enum CryptoError: Error, LocalizedError, Equatable {
-    static func == (lhs: CryptoError, rhs: CryptoError) -> Bool {
-        lhs.errorDescription == rhs.errorDescription
-    }
-    
+enum CryptoError: Error, LocalizedError {
     case connectionFailed(Error)
     case decodingFailed(Error)
     case disconnected(code: UInt16, reason: String)
@@ -28,5 +24,11 @@ enum CryptoError: Error, LocalizedError, Equatable {
         case .unknown:
             return "Unknown error occurred."
         }
+    }
+}
+
+extension CryptoError: Equatable {
+    static func == (lhs: CryptoError, rhs: CryptoError) -> Bool {
+        lhs.errorDescription == rhs.errorDescription
     }
 }

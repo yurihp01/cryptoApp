@@ -8,36 +8,40 @@
 import Combine
 import Foundation
 
+import Foundation
+import Combine
+
 final class CryptoListViewModel: ObservableObject {
     @Published var state: ViewState<[Crypto]> = .loading
-    
+
     private let service: CryptoWebSocketServiceProtocol
     private var cancellables = Set<AnyCancellable>()
-    
+
     init(service: CryptoWebSocketServiceProtocol) {
         self.service = service
         bind()
+        service.connect()
     }
-    
+
     func retry() {
         state = .loading
-        bind()
+        service.connect()
     }
 }
 
 private extension CryptoListViewModel {
     func bind() {
-        service.getCryptos()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] result in
-                switch result {
-                case .success(let cryptos):
-                    self?.state = .success(cryptos)
-                case .failure(let error):
-                    self?.state = .failure(error)
-                }
+        service.cryptosPublisher
+            .sink { [weak self] cryptos in
+                guard let self else { return }
+                self.state = .success(cryptos)
+            }
+            .store(in: &cancellables)
+
+        service.errorPublisher
+            .sink { [weak self] error in
+                self?.state = .failure(error)
             }
             .store(in: &cancellables)
     }
 }
-

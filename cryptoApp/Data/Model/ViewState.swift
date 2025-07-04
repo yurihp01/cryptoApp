@@ -8,7 +8,7 @@
 enum ViewState<T> {
     case loading
     case success(T)
-    case failure(CryptoError)
+    case failure(Error)
 }
 
 extension ViewState: Equatable where T: Equatable {

@@ -3,79 +3,84 @@ import Combine
 
 // MARK: - Protocol
 protocol CryptoWebSocketServiceProtocol {
-    func getCryptos() -> AnyPublisher<Result<[Crypto], CryptoError>, Never>
+    var cryptosPublisher: AnyPublisher<[Crypto], Never> { get }
+    var errorPublisher: AnyPublisher<CryptoError, Never> { get }
+    func connect()
 }
 
 // MARK: - Service
 final class CryptoWebSocketService: CryptoWebSocketServiceProtocol {
+    private let cryptosSubject = CurrentValueSubject<[Crypto], Never>([])
+    private let errorSubject = PassthroughSubject<CryptoError, Never>()
     private let symbols: [String]
     private let session: URLSession
-    private let subject = CurrentValueSubject<Result<[Crypto], CryptoError>, Never>(.success([]))
+    
     private var task: URLSessionWebSocketTask?
     private var isConnected = false
     private var cryptos: [String: Crypto] = [:]
     
+    var cryptosPublisher: AnyPublisher<[Crypto], Never> {
+        cryptosSubject
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+
+    var errorPublisher: AnyPublisher<CryptoError, Never> {
+        errorSubject
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+
     init(symbols: [String], session: URLSession = .shared) {
         self.symbols = symbols
         self.session = session
-        
-        connect()
     }
-    
-    func getCryptos() -> AnyPublisher<Result<[Crypto], CryptoError>, Never> {
-        subject.eraseToAnyPublisher()
-    }
-}
 
-// MARK: - Private methods
-private extension CryptoWebSocketService {
     func connect() {
+        guard !isConnected else { return }
+
         let stream = symbols.map { "\($0.lowercased())@ticker" }.joined(separator: "/")
-        
-        guard let url = URL(string: "wss://stream.binance.com:9443/stream?streams=\(stream)"),
-              !isConnected else { return }
-        
+        guard let url = URL(string: "wss://stream.binance.com:9443/stream?streams=\(stream)") else { return }
+
         task = session.webSocketTask(with: url)
         task?.resume()
         isConnected = true
         receive()
     }
-    
+}
+
+private extension CryptoWebSocketService {
     func receive() {
         task?.receive { [weak self] result in
             guard let self else { return }
-            
+
             switch result {
             case .success(let message):
                 if case .string(let text) = message {
-                    self.handleMessage(text)
+                    handleMessage(text)
                 }
-                self.receive()
-                
+                receive()
+
             case .failure(let error):
-                self.subject.send(.failure(.connectionFailed(error)))
-                self.reconnectWithDelay()
+                isConnected = false
+                errorSubject.send(.connectionFailed(error))
+                reconnectWithDelay()
             }
         }
     }
-    
+
     func handleMessage(_ text: String) {
-        guard let data = text.data(using: .utf8) else {
-            subject.send(.failure(.decodingFailed(NSError(domain: "Invalid UTF-8", code: 0))))
+        guard let data = text.data(using: .utf8),
+              let wrapper = try? JSONDecoder().decode(BinanceStreamWrapper.self, from: data) else {
+            errorSubject.send(.decodingFailed(NSError(domain: "Decode", code: 0)))
             return
         }
-        
-        do {
-            let wrapper = try JSONDecoder().decode(BinanceStreamWrapper.self, from: data)
-            cryptos[wrapper.data.symbol.rawValue] = wrapper.data
-            subject.send(.success(Array(cryptos.values)))
-        } catch {
-            subject.send(.failure(.decodingFailed(error)))
-        }
+
+        cryptos[wrapper.data.symbol.rawValue] = wrapper.data
+        cryptosSubject.send(Array(cryptos.values))
     }
-    
+
     func reconnectWithDelay() {
-        isConnected = false
         DispatchQueue.global().asyncAfter(deadline: .now() + 2) { [weak self] in
             self?.connect()
         }

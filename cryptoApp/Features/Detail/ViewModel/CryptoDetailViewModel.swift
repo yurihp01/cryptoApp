@@ -9,33 +9,43 @@ import Foundation
 import Combine
 
 final class CryptoDetailViewModel: ObservableObject {
-    private let service: CryptoWebSocketServiceProtocol
+    @Published var state: ViewState<Crypto> = .loading
     
-    @Published var crypto: Crypto
+    private let service: CryptoWebSocketServiceProtocol
+    private let cryptoSymbol: Symbols
     private var cancellables = Set<AnyCancellable>()
     
     init(crypto: Crypto, service: CryptoWebSocketServiceProtocol) {
-        self.crypto = crypto
         self.service = service
-        
-        bindCrypto()
+        self.cryptoSymbol = crypto.symbol
+        self.state = .success(crypto)
+        bind()
+    }
+    
+    func retry() {
+        state = .loading
+        service.connect()
     }
 }
 
 private extension CryptoDetailViewModel {
-    func bindCrypto() {
-        service.getCryptos()
+    func bind() {
+        service.cryptosPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] result in
-                switch result {
-                case .success(let cryptos):
-                    guard let self,
-                          let crypto = cryptos.first(where: { $0.symbol == self.crypto.symbol }) else { return }
-                    self.crypto = crypto
-                case .failure:
-                    break
+            .sink { [weak self] cryptos in
+                guard let self else { return }
+                if let updated = cryptos.first(where: { $0.symbol == self.cryptoSymbol }) {
+                    self.state = .success(updated)
                 }
+            }
+            .store(in: &cancellables)
+        
+        service.errorPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.state = .failure(error)
             }
             .store(in: &cancellables)
     }
 }
+
