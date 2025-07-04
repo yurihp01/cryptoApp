@@ -2,7 +2,7 @@
 
 A modern iOS application built with **SwiftUI**, **Combine**, and **MVVM-C** architecture that tracks real-time cryptocurrency data via WebSocket.
 
-https://user-images.githubusercontent.com/your-video-id/app-working.MP4
+https://github.com/user-attachments/assets/85357ebf-1a41-47ae-8922-95f8ae267243
 
 ---
 
@@ -41,13 +41,6 @@ https://user-images.githubusercontent.com/your-video-id/app-working.MP4
 > This app **must be tested on a real device**.
 >
 > Due to simulator limitations, WebSocket connections may not reconnect properly after toggling airplane mode or Wi-Fi. This makes real device testing crucial for accurate network behavior validation.
-
----
-
-## 📹 Demo Video
-
-https://user-images.githubusercontent.com/your-video-id/app-working.MP4
-
 
 ---
 
