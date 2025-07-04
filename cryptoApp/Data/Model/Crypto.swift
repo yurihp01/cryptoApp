@@ -56,3 +56,14 @@ extension Crypto {
         case absoluteChange = "p"
     }
 }
+
+extension Crypto {
+    static var mockCrypto: Crypto {
+        Crypto(
+            symbol: .btcusdt,
+            price: "35000",
+            percentChange: "2.5",
+            absoluteChange: "100000"
+        )
+    }
+}
